@@ -1,0 +1,12 @@
+# Deliberate exceptions, each with a reason. Run with:
+#   rpmlint -r packaging/studio-1810c.rpmlintrc studio-1810c-*.rpm
+addFilter(r"spelling-error")
+# "faders", "modelled" (British spelling) and "snd" (as in snd-usb-audio) are
+# correct words in this domain.
+
+addFilter(r"only-non-binary-in-usr-lib")
+# The payload is Python and JavaScript by design; none of it is compiled.
+
+addFilter(r"explicit-lib-dependency libusb1")
+# pyusb loads libusb at runtime through ctypes, so there is no ELF dependency
+# for rpm to generate and the package would otherwise not pull libusb in.

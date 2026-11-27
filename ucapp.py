@@ -61,8 +61,23 @@ class Window(Gtk.ApplicationWindow):
         super().__init__(application=app, title=APP_NAME)
         self.surface = surface
         self.url = url
-        self.set_default_size(1400, 880)
-        self.set_size_request(1024, 700)
+        # Fit the screen it will actually run on: 1400x880 is the comfortable
+        # size, but a musician's laptop is often 1366x768 and a window taller
+        # than the screen hides the master faders.
+        width, height = 1400, 880
+        # Gtk.Widget.get_screen() rather than importing Gdk: a bare
+        # "from gi.repository import Gdk" loads Gdk 4.0 alongside Gtk 3.0 and
+        # the import dies with "Gdk version 3.0, but 4.0 is already loaded".
+        try:
+            screen = self.get_screen()
+            monitor = screen.get_primary_monitor() or screen.get_monitor(0)
+            area = monitor.get_workarea()
+            width = min(width, max(1024, area.width - 40))
+            height = min(height, max(680, area.height - 60))
+        except (AttributeError, TypeError):
+            pass
+        self.set_default_size(width, height)
+        self.set_size_request(min(1024, width), min(680, height))
         for icon in ("packaging/studio-1810c.svg", "studio-1810c.svg",
                      "/usr/share/icons/hicolor/scalable/apps/studio-1810c.svg"):
             path = icon if icon.startswith("/") else os.path.join(HERE, icon)

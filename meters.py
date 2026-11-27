@@ -148,10 +148,11 @@ class Channel:
 class MeterSource:
     """One PipeWire node being metered."""
 
-    def __init__(self, name, channels, positions=None):
+    def __init__(self, name, channels, positions=None, refresh=None):
         self.name = name
         self.channels = channels
         self.positions = positions or []
+        self.refresh = refresh          # re-reads the node before each restart
         self.level = [Channel() for _ in range(channels)]
         self.rate = 0.0
         self.ok = False
@@ -178,7 +179,31 @@ class MeterSource:
             if not self._stop:
                 time.sleep(2.0)                       # node appeared/disappeared
 
+    def _refresh_layout(self):
+        """A rate/altset change can alter the channel count; re-read it.
+
+        Reconnecting with the old count would either fail or read the wrong
+        channels, and the meters would lie instead of breaking.
+        """
+        if not self.refresh:
+            return
+        try:
+            spec = self.refresh()
+        except Exception:
+            return
+        if not spec:
+            return
+        name, channels, positions = spec
+        if channels and channels != self.channels:
+            self.channels = channels
+            self.level = [Channel() for _ in range(channels)]
+        if positions:
+            self.positions = positions
+        if name:
+            self.name = name
+
     def _capture(self):
+        self._refresh_layout()
         pw_cat = shutil.which("pw-cat") or shutil.which("pw-record")
         parec = shutil.which("parec")
         if not pw_cat and not parec:
@@ -274,11 +299,13 @@ class Meters:
         src, mon, src_node, mon_node = find_nodes()
         if src and not self.inputs:
             channels = (src_node or {}).get("channels") or 2
-            self.inputs = MeterSource(src, channels, (src_node or {}).get("positions"))
+            self.inputs = MeterSource(src, channels, (src_node or {}).get("positions"),
+                                      refresh=lambda: self._spec("input"))
             self.inputs.start()
         if mon and not self.outputs:
             channels = (mon_node or {}).get("channels") or 2
-            self.outputs = MeterSource(mon, channels, (mon_node or {}).get("positions"))
+            self.outputs = MeterSource(mon, channels, (mon_node or {}).get("positions"),
+                                       refresh=lambda: self._spec("output"))
             self.outputs.start()
         self._discovered = bool(src or mon)
         if not self._discovered:
@@ -288,6 +315,17 @@ class Meters:
             self.note = "no input source found"
         elif not mon:
             self.note = "no output monitor found"
+
+    def _spec(self, kind):
+        """Current (name, channels, positions) for input or output."""
+        src, mon, src_node, mon_node = find_nodes()
+        if kind == "input" and src:
+            return (src, (src_node or {}).get("channels") or 0,
+                    (src_node or {}).get("positions"))
+        if kind == "output" and mon:
+            return (mon, (mon_node or {}).get("channels") or 0,
+                    (mon_node or {}).get("positions"))
+        return None
 
     def snapshot(self):
         if not self._discovered:

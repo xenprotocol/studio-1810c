@@ -56,6 +56,34 @@ class DegradesGracefully(unittest.TestCase):
         self.assertEqual(ch.db, -96.0)
 
 
+class RefreshesOnRateChange(unittest.TestCase):
+    """A device_setup change alters the channel count; reconnecting with the old
+    count would read the wrong channels rather than fail loudly."""
+
+    def test_channels_and_positions_are_reread(self):
+        src = meters.MeterSource("node", 14, ["AUX%d" % i for i in range(14)])
+        src.refresh = lambda: ("node", 18, ["AUX%d" % i for i in range(18)])
+        src._refresh_layout()
+        self.assertEqual(src.channels, 18)
+        self.assertEqual(len(src.level), 18)
+        self.assertEqual(len(src.positions), 18)
+
+    def test_missing_node_keeps_the_last_known_layout(self):
+        src = meters.MeterSource("node", 8, ["FL", "FR"])
+        src.refresh = lambda: None
+        src._refresh_layout()
+        self.assertEqual(src.channels, 8)
+        self.assertEqual(src.positions, ["FL", "FR"])
+
+    def test_broken_resolver_does_not_kill_the_reader(self):
+        src = meters.MeterSource("node", 8, [])
+        def boom():
+            raise RuntimeError("pw-dump exploded")
+        src.refresh = boom
+        src._refresh_layout()
+        self.assertEqual(src.channels, 8)
+
+
 class LevelCurve(unittest.TestCase):
     """The bar scale must be monotonic and clamp at both ends."""
 

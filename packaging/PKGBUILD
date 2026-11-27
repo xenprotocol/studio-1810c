@@ -7,9 +7,10 @@ arch=('any')
 url="https://github.com/xenprotocol/studio-1810c"
 license=('MIT')
 depends=('python' 'python-gobject' 'gtk3' 'webkit2gtk-4.1' 'libusb')
+makedepends=('librsvg')
 optdepends=('alsa-utils: sample-rate readout and uc1810c.py doctor')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/xenprotocol/studio-1810c/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')   # replace with the real sum before publishing
+sha256sums=('89e680ca6ad2ae2a5888015c577294bdf04763ccbbc42b702c2b436fbb547a63')
 
 package() {
   local appdir="$pkgdir/usr/lib/studio-1810c"
@@ -23,7 +24,7 @@ package() {
             "$pkgdir/usr/lib/udev/rules.d" \
             "$pkgdir/usr/share/icons/hicolor/scalable/apps"
 
-  install -m644 "$srcdir/$pkgname-$pkgver/"{ucapp.py,ucd.py,uc1810c.py,meters.py} "$appdir/"
+  install -m755 "$srcdir/$pkgname-$pkgver/"{ucapp.py,ucd.py,uc1810c.py,meters.py} "$appdir/"
   cp -r "$srcdir/$pkgname-$pkgver/ui/." "$appdir/ui/"
   cp -r "$srcdir/$pkgname-$pkgver/vendor/." "$appdir/vendor/"
   find "$appdir" -name __pycache__ -type d -prune -exec rm -rf {} +

@@ -124,10 +124,29 @@ rpmbuild -bb packaging/studio-1810c.spec \
   --define "_topdir $PWD/rpmbuild"
 ```
 
-Result: `rpmbuild/RPMS/noarch/studio-1810c-1.0.0-1.*.rpm`.
+Result: `rpmbuild/RPMS/noarch/studio-1810c-1.1.1-1.*.rpm`.
 
 The spec is marked `BuildArch: noarch` on purpose — there is nothing to compile —
 and its `%post` reloads udev exactly like the Debian post-install does.
+
+**Status: built and linted.** `studio-1810c-1.1.1-1.fc40.noarch.rpm` was produced
+on Fedora 40 and `rpmlint` reports *0 errors, 0 warnings*. Eight findings are
+filtered deliberately in `packaging/studio-1810c.rpmlintrc`, each with a reason
+in the file (British spellings, non-binary payload in `/usr/lib`, and the explicit
+`libusb1` requirement that rpm cannot generate because pyusb dlopens libusb).
+
+If you build in a container, note that `%{_sourcedir}` points at your checkout:
+
+```bash
+docker run --rm -v "$PWD":/src:ro -v "$PWD/dist/rpm":/out fedora:40 bash -lc '
+  dnf -y install rpm-build librsvg2-tools rpmlint
+  rpmbuild -bb /src/packaging/studio-1810c.spec \
+    --define "_sourcedir /src" --define "_rpmdir /out" --define "_buildrootdir /tmp/br"
+  rpmlint -r /src/packaging/studio-1810c.rpmlintrc /out/noarch/*.rpm'
+```
+
+The output directory ends up owned by root: build into a mount point you can
+delete, or fix ownership from inside a container afterwards.
 
 ---
 
@@ -137,7 +156,24 @@ and its `%post` reloads udev exactly like the Debian post-install does.
 cd packaging && makepkg -si        # uses PKGBUILD
 ```
 
-or copy `packaging/PKGBUILD` into a directory with the source and run `makepkg`.
+The PKGBUILD downloads the tagged release tarball and verifies its SHA-256, so a
+wrong checksum fails the build instead of shipping.
+
+**Status: built.** Run on a clean `archlinux` image it produced
+`studio-1810c-1.1.0-1-any.pkg.tar.zst` from the `v1.1.0` tarball, which also
+proves the checksum and the Arch dependency names (`python-gobject`, `gtk3`,
+`webkit2gtk-4.1`, `libusb`) are correct.
+
+In a container, install the dependencies as root first — `makepkg -s` cannot
+`sudo` as the build user:
+
+```bash
+docker run --rm -v "$PWD/packaging":/pk:ro -v "$PWD/dist/arch":/out archlinux bash -lc '
+  pacman -Sy --noconfirm --needed base-devel librsvg python-gobject gtk3 webkit2gtk-4.1 libusb
+  useradd -m builder && mkdir -p /home/builder/pkg
+  cp /pk/PKGBUILD /home/builder/pkg/ && chown -R builder /home/builder/pkg
+  su builder -c "cd /home/builder/pkg && makepkg -f --noconfirm"'
+```
 
 ---
 

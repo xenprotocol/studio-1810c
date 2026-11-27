@@ -347,6 +347,21 @@ def doctor(dev, pid):
     node = "/dev/bus/usb/%03d/%03d" % (dev.dev.bus, dev.dev.address) if dev.dev else None
     if node:
         print("  usbfs node :", node, "writable" if os.access(node, os.W_OK) else "NOT writable (need udev rule)")
+
+    # Metering is computed from the audio stream, so a report about missing bars
+    # is really a report about these nodes. Discovery only - no reader starts.
+    try:
+        import meters as _meters
+        src, mon, src_node, mon_node = _meters.find_nodes()
+        if src or mon:
+            print("  meters     : in %dch (%s)"
+                  % ((src_node or {}).get("channels") or 0, (src or "none").split(".")[-1]))
+            print("               out %dch (%s)"
+                  % ((mon_node or {}).get("channels") or 0, (mon or "none").split(".")[-1]))
+        else:
+            print("  meters     : no PipeWire/PulseAudio node found - bars will be absent")
+    except Exception as exc:                      # never let a diagnostic crash
+        print("  meters     : unavailable (%s)" % exc)
     print("\n  Hint: at 96 kHz the 1810c runs 8 out / 14 in, at 192 kHz 6 out / 8 in;"
           "\n  `device_setup` selects the ALTSET the kernel keeps. Rate is chosen by"
           "\n  the ALSA client, not by this tool.")

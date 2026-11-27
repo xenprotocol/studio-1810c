@@ -1,0 +1,78 @@
+name: Something is wrong
+description: The mixer window does not work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time — reports from people with the hardware on their
+        desk are the only way this improves. Two details save a week of guessing:
+        your interface's identity, and what the app says about it.
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Ubuntu 24.04, Fedora 40, Arch, …
+    validations:
+      required: true
+
+  - type: input
+    id: session
+    attributes:
+      label: Desktop session
+      description: Output of `echo $XDG_SESSION_TYPE` (wayland or x11) and your desktop (GNOME, KDE, …)
+    validations:
+      required: false
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of the doctor command
+      description: |
+        Run this and paste everything it prints. It is read-only.
+        ```
+        python3 /usr/lib/studio-1810c/uc1810c.py doctor
+        ```
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what you expected
+      placeholder: |
+        Pressing "Push session" with Analog 1 at 0 dB does not change the level in my DAW.
+        I expected the matrix cell to follow.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: meters
+    attributes:
+      label: Do the meter bars move?
+      options:
+        - "Yes, they follow the audio"
+        - "No, they stay empty"
+        - "There are no bars at all"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: input
+    id: audio
+    attributes:
+      label: Audio server
+      description: PipeWire, PulseAudio, or neither (plain ALSA)? `pactl info | head -3` says which.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste a full `lsusb -v` here** — it is long and noisy. The doctor
+        output above already contains what is needed.
+
+        Please also say whether your DAW was open at the time. The interface is
+        shared, so knowing if something else held the device changes the diagnosis.

@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (no hardware)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The protocol tests are byte-exact and need no interface attached.
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyusb
+
+      - name: Protocol checks
+        run: python tests/test_protocol.py
+
+      - name: Meter and device-guard tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+  package:
+    name: .deb builds and lints clean
+    runs-on: ubuntu-24.04
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            lintian librsvg2-bin desktop-file-utils
+
+      - name: Build the package
+        run: ./packaging/build-deb.sh
+
+      - name: lintian must be silent
+        run: |
+          out=$(lintian dist/*.deb)
+          if [ -n "$out" ]; then echo "$out"; exit 1; fi
+          echo "lintian clean"
+
+      - name: Validate the desktop entry
+        run: desktop-file-validate packaging/io.github.uc1810c.Mixer.desktop
+
+      - name: Package installs its payload in the right place
+        run: |
+          dpkg-deb -c dist/*.deb | grep -q './usr/lib/studio-1810c/ucapp.py'
+          dpkg-deb -c dist/*.deb | grep -q './usr/lib/studio-1810c/meters.py'
+          dpkg-deb -c dist/*.deb | grep -q './usr/bin/studio-1810c'
+          echo "payload ok"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-1810c-deb
+          path: dist/*.deb
+          if-no-files-found: error

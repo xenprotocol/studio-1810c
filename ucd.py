@@ -121,7 +121,7 @@ class Surface:
             self.error = None
         except SystemExit as exc:
             self.dev = None
-            self.error = str(exc)
+            self.error = other_interface_note() or str(exc)
 
     def require(self):
         if self.dev is None:
@@ -235,6 +235,28 @@ class Surface:
 
 SURFACE = None
 METERS = None
+
+OTHER_MODELS = {0x0107: "Studio 1824", 0x010D: "Studio 1824c"}
+
+
+def other_interface_note():
+    """If some other Studio interface is plugged in, say which one.
+
+    Their matrix is a different size, so writing the 1810c layout to one would
+    put levels in the wrong cells. Refusing is the only safe behaviour; naming
+    the device stops the user thinking the app is broken.
+    """
+    try:
+        uc._ensure_pyusb()
+        import usb.core
+        for pid, name in OTHER_MODELS.items():
+            if usb.core.find(idVendor=uc.VID, idProduct=pid) is not None:
+                return ("A %s is connected (194f:%04x), but this app only speaks "
+                        "the Studio 1810c. Its matrix is a different size, so "
+                        "nothing was written." % (name, pid))
+    except Exception:
+        pass
+    return None
 
 
 class Handler(BaseHTTPRequestHandler):

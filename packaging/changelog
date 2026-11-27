@@ -1,3 +1,22 @@
+studio-1810c (1.1.1) unstable; urgency=medium
+
+  * The window fits the screen it opens on (1024x680 minimum): 1400x880 on a
+    1366x768 laptop pushed the master faders off the bottom.
+  * Channel strips shrink below 1500 px so more fit on a laptop, and their
+    names no longer truncate to "Analo...".
+  * Meters re-read the node channel count when the stream restarts, so an
+    ALTSET change cannot leave the bars reading the wrong channels.
+  * A Studio 1824 or 1824c is refused by name instead of a generic "no device":
+    their matrix is a different size and nothing is written to them.
+  * `uc1810c.py doctor` reports the meter sources, which is the first thing to
+    check when bars are missing.
+  * Packaging: RPM built on Fedora 40 and rpmlint-clean (0 errors, 0 warnings,
+    exceptions declared with reasons); PKGBUILD checksum is real, not SKIP.
+  * CI runs the protocol, meter and device-guard tests and fails on any lintian
+    output.
+
+ -- Studio 1810c for Linux <studio-1810c@users.noreply.github.com>  Fri, 27 Nov 2026 16:10:00 +0100
+
 studio-1810c (1.1.0) unstable; urgency=medium
 
   * Level meters for every input strip and output pair, computed from the audio

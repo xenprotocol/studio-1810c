@@ -48,10 +48,10 @@ mixer matrix, exactly as the kernel already does at probe time.
 
 ### Ubuntu, Debian, Linux Mint (the normal way)
 
-Download `studio-1810c_1.1.0_amd64.deb` from [Releases](../../releases), then:
+Download `studio-1810c_1.1.1_amd64.deb` from [Releases](../../releases), then:
 
 ```bash
-sudo apt install ./studio-1810c_1.1.0_amd64.deb
+sudo apt install ./studio-1810c_1.1.1_amd64.deb
 ```
 
 or double-click the file and let your software installer handle it. `apt` pulls
@@ -186,10 +186,32 @@ Being straight about this, because you will notice:
 | | |
 |---|---|
 | Interface | PreSonus / Fender Studio 1810c (`194f:010c`) |
-| Also expected to work | Studio 1824 (`194f:0107`), 1824c (`194f:010d`) — untested |
-| Distributions | Any with GTK 3 + WebKitGTK and Python 3.8+; `.deb` built for Ubuntu 22.04+ |
+| Other Studio models | **Refused by design.** The 1824 (`194f:0107`) and 1824c (`194f:010d`) have a different matrix size; the app names the device it found and writes nothing rather than putting levels in the wrong cells. Supporting them needs their own layout tables. |
+| Distributions | Any with GTK 3 + WebKitGTK and Python 3.8+; `.deb` for Ubuntu 22.04+, RPM for Fedora 40, `PKGBUILD` for Arch |
+| Screen | Adapts down to 1024×680; strips shrink below 1500 px so a 1366×768 laptop still shows the master faders |
 | Kernel | Stock `snd-usb-audio`; no patching, no modules unloaded |
-| Desktop | GNOME, KDE, Xfce — Wayland and X11 |
+| Desktop | GNOME, KDE, Xfce — Wayland and X11, both tested |
+
+## If something goes wrong
+
+Run the doctor. It reads only, changes nothing, and prints what a diagnosis needs:
+
+```bash
+python3 /usr/lib/studio-1810c/uc1810c.py doctor
+```
+
+Paste that output into the [issue template](../../issues/new/choose) along with
+your distribution and whether a DAW was open. It reports the USB identities, the
+udev permission on the device node, the ALSA controls the card exposes, and which
+meter sources were found.
+
+Two things that look like bugs and are not:
+
+- **"A Studio 1824 is connected…"** — the app refuses other models on purpose,
+  because their matrix is a different size and writing the 1810c layout into one
+  would land levels in the wrong cells.
+- **Meter bars absent** — no PipeWire/PulseAudio to read from. Everything else
+  still works; routing does not depend on the audio server.
 
 ## Documentation
 

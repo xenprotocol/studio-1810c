@@ -314,6 +314,22 @@ body {
   .bar { flex-wrap: wrap; }
   .written { display: none; }
 }
+/* Laptop displays: narrower strips put more channels on screen at once.
+   The strip row scrolls, so this is about how much a musician sees, not clipping. */
+@media (max-width: 1500px) {
+  :root { --strip-w: 64px; --fader-h: 120px; }
+}
+@media (max-width: 1320px) {
+  :root { --strip-w: 56px; --fader-h: 108px; }
+  .brand__sub, .mixer__sub { display: none; }
+  /* "Analog 1" has to fit a 56px strip without ellipsis */
+  .strip__name { font-size: 10.5px; }
+  .strip__db { font-size: 11px; }
+}
+@media (max-width: 1150px) {
+  :root { --strip-w: 50px; --fader-h: 96px; }
+}
+
 /* ---------- level meters (fed from PipeWire) ---------- */
 .strip__meter, .out__meter {
   position: absolute; top: 0; bottom: 0; right: -7px; width: 5px;

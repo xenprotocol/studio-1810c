@@ -2,7 +2,7 @@
 %global appdir %{_prefix}/lib/studio-1810c
 
 Name:           studio-1810c
-Version:        1.1.0
+Version:        1.1.1
 Release:        1%{?dist}
 Summary:        Mixer and routing control for the PreSonus / Fender Studio 1810c
 License:        MIT
@@ -39,7 +39,8 @@ install -d %{buildroot}%{appdir}/ui \
            %{buildroot}%{_prefix}/lib/udev/rules.d \
            %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 
-install -m644 %{_sourcedir}/ucapp.py %{_sourcedir}/ucd.py %{_sourcedir}/uc1810c.py \
+# 0755: each of these carries a shebang and runs standalone as a CLI
+install -m755 %{_sourcedir}/ucapp.py %{_sourcedir}/ucd.py %{_sourcedir}/uc1810c.py \
     %{_sourcedir}/meters.py %{buildroot}%{appdir}/
 cp -r %{_sourcedir}/ui/. %{buildroot}%{appdir}/ui/
 cp -r %{_sourcedir}/vendor/. %{buildroot}%{appdir}/vendor/
@@ -90,6 +91,12 @@ command -v udevadm >/dev/null && udevadm control --reload-rules || :
 %{_prefix}/lib/udev/rules.d/99-presonus-1810c.rules
 
 %changelog
+* Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.1.1-1
+- Window fits small screens; strips scale down and names no longer truncate
+- Meters re-read channel counts when the stream restarts (ALTSET change)
+- Refuse Studio 1824 / 1824c by name; doctor reports meter sources
+- rpmlint-clean: exceptions declared with reasons in studio-1810c.rpmlintrc
+
 * Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.1.0-1
 - Level meters computed from the audio stream (PipeWire), per input and per output pair
 
