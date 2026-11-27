@@ -134,8 +134,32 @@ Components:
 | **strip grid** (centre) | the 36 input channels feeding the selected pair, grouped Analog / S-PDIF / ADAT / DAW. |
 | **master** | output faders for all four pairs, always visible. |
 | **global switches** | the five front-panel switches. |
+| **meters** | the thin bars beside every fader: live level, see [Meters](#meters) below. |
 | **telemetry** | eight values read from the device that have not been identified yet. Shown raw on purpose. |
 | **footer** | device identity: VID:PID, bus address, firmware where readable. |
+
+### Meters
+
+Every fader has a thin bar beside it. They are **real levels, measured from the
+audio**, not from the interface: this firmware does not report levels to the
+host at all (the evidence is in `PROTOCOL.md`). The bars are computed from the
+audio that PipeWire is moving, so:
+
+- **input bars** (Analog 1–8, S/PDIF, ADAT) show what the interface is capturing;
+- **output bars** (Main, Line 1/2, Line 3/4, S/PDIF) show what is being sent to
+  that output pair.
+
+The scale runs from −60 dB to +6 dB, green up to about −12 dB, amber near 0, red
+at the top. The bars peak-hold for a fifth of a second and fall back at
+14 dB/s, so a transient stays visible long enough to read.
+
+Two honest limits:
+
+- they need **PipeWire** (or PulseAudio) — if neither is running, the bars are
+  simply absent and everything else works;
+- they meter the **audio path**, which is what a musician wants, but it means a
+  send you make in the matrix does not change an input bar: the input bar shows
+  the preamp, the output bar shows what leaves the computer.
 
 ---
 

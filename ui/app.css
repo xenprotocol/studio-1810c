@@ -314,6 +314,22 @@ body {
   .bar { flex-wrap: wrap; }
   .written { display: none; }
 }
+/* ---------- level meters (fed from PipeWire) ---------- */
+.strip__meter, .out__meter {
+  position: absolute; top: 0; bottom: 0; right: -7px; width: 5px;
+  border: 1px solid var(--rule); border-radius: 3px; overflow: hidden;
+  pointer-events: none;
+  /* the track carries the scale, so colour means level, not bar height */
+  background: linear-gradient(to top, var(--ok) 0%, var(--ok) 62%,
+              var(--warn) 84%, var(--danger) 100%);
+}
+.strip__meter-mask, .out__meter-mask {
+  position: absolute; left: 0; right: 0; top: 0; height: 100%;
+  transition: height 70ms linear;
+}
+.strip__meter-mask { background: var(--panel2); }
+.out__meter-mask { background: var(--panel); }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

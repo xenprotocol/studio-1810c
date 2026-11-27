@@ -147,6 +147,14 @@ function buildStrip(input) {
   mute.setAttribute("aria-pressed", String(s.mute));
   mute.setAttribute("aria-label", input.name + " mute");
 
+  const channels = state.meterMeta?.input_channels || 0;
+  if (input.ch < channels) {
+    // inside the fader, so it cannot drift away from the scale it belongs to
+    const meter = document.createElement("div");
+    meter.className = "strip__meter";
+    meter.innerHTML = '<div class="strip__meter-mask"></div>';
+    fader.append(meter);
+  }
   el.append(name, dbBtn, fader, pan, mute);
   paintStrip(el, s);
 
@@ -343,6 +351,7 @@ function renderOutputs() {
     const out = state.outputs[String(p)] || { db: 0, mute: false };
     const el = document.createElement("div");
     el.className = "out";
+    el.dataset.pair = p;
     el.innerHTML = '<span class="out__name"></span>' +
       '<div class="fader" role="slider" tabindex="0" aria-valuemin="-96" aria-valuemax="10">' +
       '<div class="fader__track"></div><div class="fader__fill"></div>' +
@@ -355,6 +364,12 @@ function renderOutputs() {
     fader.querySelector(".fader__fill").style.height = (pos * 100) + "%";
     fader.querySelector(".fader__thumb").style.bottom = (pos * 100) + "%";
     fader.querySelector(".fader__unity").style.bottom = (posFromDb(0) * 100) + "%";
+    if (state.meterPairs && state.meterPairs.length) {
+      const meter = document.createElement("div");
+      meter.className = "out__meter";
+      meter.innerHTML = '<div class="out__meter-mask"></div>';
+      fader.append(meter);
+    }
     fader.setAttribute("aria-label", PAIR_NAMES[p] + " output level");
     fader.setAttribute("aria-valuenow", out.db.toFixed(1));
 
@@ -492,6 +507,37 @@ function markWritten() {
 
 /* ---------------- boot ---------------- */
 
+// -60 dB .. +6 dB across the bar; anything quieter reads as empty
+function levelPercent(db) {
+  if (db === undefined || db === null) return 0;
+  return Math.max(0, Math.min(1, (db + 60) / 66)) * 100;
+}
+
+function applyLevels(data) {
+  const inputs = data.inputs || [];
+  document.querySelectorAll(".strip").forEach((el) => {
+    const mask = el.querySelector(".strip__meter-mask");
+    if (!mask) return;
+    const db = inputs[Number(el.dataset.ch)];
+    // the track carries the colour scale; the mask hides the part above the level
+    mask.style.height = (100 - levelPercent(db)) + "%";
+    el.classList.toggle("strip--hot", db != null && db > -3);
+  });
+
+  const outs = data.outputs || [];
+  const pairs = state.meterPairs || [];
+  document.querySelectorAll(".out").forEach((el) => {
+    const mask = el.querySelector(".out__meter-mask");
+    if (!mask) return;
+    const pair = pairs[Number(el.dataset.pair)] || [Number(el.dataset.pair) * 2,
+                                                    Number(el.dataset.pair) * 2 + 1];
+    const a = outs[pair[0]], b = outs[pair[1]];
+    const db = Math.max(a ?? -96, b ?? -96);
+    mask.style.height = (100 - levelPercent(db)) + "%";
+    el.classList.toggle("out--hot", db > -3);
+  });
+}
+
 function applyInfo(info) {
   state.info = info;
   state.strips = Object.assign({}, info.state.strips, state.strips);
@@ -500,6 +546,8 @@ function applyInfo(info) {
   state.swRead = info.switches_read;
   state.telemetry = info.telemetry || [];
   state.error = info.error;
+  state.meterMeta = info.meters || {};
+  state.meterPairs = (info.meters && info.meters.output_pairs) || [];
 
   if (info.device) {
     setChip($("#chip-link"), "connected", "ok");
@@ -572,6 +620,11 @@ async function boot() {
       : "not pushed to device";
   };
   events.onerror = () => setChip($("#chip-link"), "stream lost", "err");
+
+  const levels = new EventSource("/api/levels");
+  levels.onmessage = (ev) => {
+    try { applyLevels(JSON.parse(ev.data)); } catch { /* ignore a torn frame */ }
+  };
 
   $("#apply").addEventListener("click", async () => {
     const btn = $("#apply");

@@ -4,7 +4,7 @@ set -euo pipefail
 
 umask 022                     # lintian-clean directory modes regardless of the caller's umask
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${VERSION:-1.0.0}"
+VERSION="${VERSION:-1.1.0}"
 ARCH="$(dpkg --print-architecture)"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
@@ -20,7 +20,7 @@ for size in 48 64 128 256; do
 done
 
 # --- payload -----------------------------------------------------------
-install -m644 "$ROOT/ucapp.py" "$ROOT/ucd.py" "$ROOT/uc1810c.py" "$APP/"
+install -m644 "$ROOT/ucapp.py" "$ROOT/ucd.py" "$ROOT/uc1810c.py" "$ROOT/meters.py" "$APP/"
 cp -r "$ROOT/ui" "$APP/ui"
 cp -r "$ROOT/vendor" "$APP/vendor"
 find "$APP" -name __pycache__ -type d -prune -exec rm -rf {} +

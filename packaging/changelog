@@ -1,3 +1,13 @@
+studio-1810c (1.1.0) unstable; urgency=medium
+
+  * Level meters for every input strip and output pair, computed from the audio
+    stream through PipeWire (the device reports no levels - see PROTOCOL.md).
+  * Poll the state packet at 2 Hz instead of faster: the device stalls 0xA1 with
+    EPIPE above roughly 4 Hz while streaming.
+  * Reconnect to the interface if it is plugged in after the window opened.
+
+ -- Studio 1810c for Linux <studio-1810c@users.noreply.github.com>  Fri, 27 Nov 2026 14:30:00 +0100
+
 studio-1810c (1.0.0) unstable; urgency=medium
 
   * First release.

@@ -2,7 +2,7 @@
 %global appdir %{_prefix}/lib/studio-1810c
 
 Name:           studio-1810c
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Mixer and routing control for the PreSonus / Fender Studio 1810c
 License:        MIT
@@ -40,7 +40,7 @@ install -d %{buildroot}%{appdir}/ui \
            %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 
 install -m644 %{_sourcedir}/ucapp.py %{_sourcedir}/ucd.py %{_sourcedir}/uc1810c.py \
-    %{buildroot}%{appdir}/
+    %{_sourcedir}/meters.py %{buildroot}%{appdir}/
 cp -r %{_sourcedir}/ui/. %{buildroot}%{appdir}/ui/
 cp -r %{_sourcedir}/vendor/. %{buildroot}%{appdir}/vendor/
 find %{buildroot}%{appdir} -name __pycache__ -type d -prune -exec rm -rf {} +
@@ -77,6 +77,7 @@ command -v udevadm >/dev/null && udevadm control --reload-rules || :
 %{appdir}/ucapp.py
 %{appdir}/ucd.py
 %{appdir}/uc1810c.py
+%{appdir}/meters.py
 %{appdir}/ui
 %{appdir}/vendor
 %{_datadir}/applications/io.github.uc1810c.Mixer.desktop
@@ -89,5 +90,8 @@ command -v udevadm >/dev/null && udevadm control --reload-rules || :
 %{_prefix}/lib/udev/rules.d/99-presonus-1810c.rules
 
 %changelog
+* Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.1.0-1
+- Level meters computed from the audio stream (PipeWire), per input and per output pair
+
 * Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.0.0-1
 - Initial package

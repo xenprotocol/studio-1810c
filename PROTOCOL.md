@@ -222,6 +222,11 @@ repeat it:
 | levels come from the DSP parameter channel | `0xC1` 0x00/0x01 and `0xD1`/`0xD2` across recipients (device, interface) and wIndex 0-5 | EPIPE on every combination |
 | the driver supplies meters | strings in `com.fender.tusbaudiodriver.dext` | only `AudioVolumeLevelControl` / `AudioLineLevelControl`; no metering code |
 
+Metering in this application therefore comes from the audio stream instead:
+`meters.py` reads the interface's PipeWire capture node and the monitor of its
+playback sink, computes true peak per channel, and the UI draws it. That is
+honest data (it is the signal), just not read from the device.
+
 The meter parameter names in `dspusbdevice.dylib` (`input1LevelMeter`,
 `input1ReductionMeter`, `input3LeftLevelMeter`, `output1LevelMeter`,
 `metercurve`) belong to the DSP-parameter model used by models that implement

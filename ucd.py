@@ -24,6 +24,11 @@ from urllib.parse import urlparse, parse_qs
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import uc1810c as uc
 
+try:
+    import meters as meterlib
+except Exception:            # metering is optional: the app must run without it
+    meterlib = None
+
 APP = "1810c"
 CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "uc1810c"
 STATE_FILE = CONFIG_DIR / "session.json"
@@ -202,7 +207,9 @@ class Surface:
         card = uc.alsa_card()
         out = {"device": None, "card": card, "alsa": {}, "pairs": [], "inputs": [],
                "state": self.state, "telemetry": self.telemetry,
-               "switches_read": self.sw_read, "error": self.error}
+               "switches_read": self.sw_read, "error": self.error,
+               "meters": (METERS.describe() if METERS is not None
+                          else {"available": False, "note": "metering not started"})}
         if self.dev is not None:
             out["device"] = {"vid": "%04x" % uc.VID, "pid": "%04x" % uc.PID_1810C,
                              "bus": self.dev.dev.bus, "addr": self.dev.dev.address}
@@ -227,6 +234,7 @@ class Surface:
 
 
 SURFACE = None
+METERS = None
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -271,6 +279,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, SURFACE.info())
         if url.path == "/api/events":
             return self._stream()
+        if url.path == "/api/levels":
+            return self._levels()
         if url.path == "/api/presets":
             PRESET_DIR.mkdir(parents=True, exist_ok=True)
             return self._send(200, sorted(p.stem for p in PRESET_DIR.glob("*.json")))
@@ -342,6 +352,26 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(500, {"error": str(exc)})
         return self._send(404, {"error": "no route"})
 
+    def _levels(self):
+        """Meter levels, ~15 Hz. Separate from /api/events so the control state
+        keeps its 1 s cadence and the meters stay smooth."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Connection", "keep-alive")
+        self.end_headers()
+        try:
+            while True:
+                if METERS is not None:
+                    snap = METERS.snapshot()
+                else:
+                    snap = {"inputs": [], "outputs": []}
+                self.wfile.write(b"data: " + json.dumps(snap).encode() + b"\n\n")
+                self.wfile.flush()
+                time.sleep(1.0 / 15.0)
+        except (BrokenPipeError, ConnectionResetError):
+            return
+
     def _stream(self):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
@@ -375,8 +405,10 @@ def serve(host="127.0.0.1", port=8777):
 
     Split out from main() so the desktop app can host it in-process.
     """
-    global SURFACE
+    global SURFACE, METERS
     SURFACE = Surface()
+    if meterlib is not None:
+        METERS = meterlib.Meters()
     threading.Thread(target=poll_loop, daemon=True).start()
     httpd = ThreadingHTTPServer((host, port), Handler)
     httpd.daemon_threads = True

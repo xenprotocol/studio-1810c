@@ -2,7 +2,7 @@
 
 **The mixer PreSonus never shipped for Linux — matrix, faders, switches, all of it.**
 
-![The Studio 1810c mixer running on Linux](docs/installed-window.png)
+![The Studio 1810c mixer running on Linux](docs/meters.png)
 
 The Studio 1810c is an 18-in / 8-out USB audio interface. On Windows and macOS,
 Universal Control gives you an 18×10 routing matrix, output faders, front-panel
@@ -22,6 +22,8 @@ is patched, and playback is never interrupted.
   level, pan and mute, feeding four output pairs.
 - **Output faders** for Main, Line 1/2, Line 3/4 and S/PDIF.
 - **Front-panel switches** from the desktop: 48 V, line/instrument, mute, mono, A/B.
+- **Level meters** — a bar per input strip and per output pair, computed from the
+  audio PipeWire is moving (the interface itself reports no levels - see below).
 - **Clock and rate readout** in the header, read from the device.
 - **Presets** — a routed setup saved once and recalled in a click.
 - **A real application**: window, menu entry, icon. No browser tab, no address
@@ -46,10 +48,10 @@ mixer matrix, exactly as the kernel already does at probe time.
 
 ### Ubuntu, Debian, Linux Mint (the normal way)
 
-Download `studio-1810c_1.0.0_amd64.deb` from [Releases](../../releases), then:
+Download `studio-1810c_1.1.0_amd64.deb` from [Releases](../../releases), then:
 
 ```bash
-sudo apt install ./studio-1810c_1.0.0_amd64.deb
+sudo apt install ./studio-1810c_1.1.0_amd64.deb
 ```
 
 or double-click the file and let your software installer handle it. `apt` pulls
@@ -155,8 +157,11 @@ when a client opens the device. The kernel's `s1810c_skip_setting_quirk`
 
 Being straight about this, because you will notice:
 
-- **Meters are not available from this firmware** — not "not decoded yet",
-  tested. In order: interface 5 (the vendor interface) has **zero endpoints** and
+- **Meters do not come from the device.** Not "not decoded yet" - tested, and
+  the test is written up in `PROTOCOL.md`. The meters you see are computed from
+  the audio stream by `meters.py`, so they need PipeWire (or PulseAudio) and they
+  show the audio path, not the interface's internal mixer state. In order:
+  interface 5 (the vendor interface) has **zero endpoints** and
   the only interrupt IN on the device is `0x83`, the 6-byte UAC2 status pipe on
   interface 0, so there is no meter stream to read; the eight raw values in the
   state packet follow neither playback (a −20 dBFS tone to S/PDIF moves them by
@@ -165,10 +170,9 @@ Being straight about this, because you will notice:
   own meter parameter names (`input1LevelMeter`, `input1ReductionMeter`, …)
   answers on no recipient or interface index. The macOS driver contains no
   metering code either — only volume and line-level controls. The conclusion is
-  that the 1810c does not report levels to the host. Honest metering on Linux has
-  to be computed from the audio stream (PipeWire peak monitoring), which is the
-  planned approach; the eight unknown values are shown raw and labelled as such
-  until they are identified.
+  that the 1810c does not report levels to the host, which is why metering is
+  computed from the audio stream instead. The eight unknown values in the state
+  packet are still shown raw and labelled as such until they are identified.
 - **Clock status semantics are unresolved.** `0xA4` answers, but returns an
   all-zero status word for internal, S/PDIF and ADAT alike — the encoding is
   unknown, so the UI reports only what it can prove.
