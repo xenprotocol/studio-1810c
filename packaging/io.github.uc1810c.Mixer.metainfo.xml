@@ -5,6 +5,7 @@
   <project_license>MIT</project_license>
   <name>Studio 1810c</name>
   <summary>Mixer and routing control for the PreSonus / Fender Studio 1810c</summary>
+
   <description>
     <p>
       A desktop mixer for the Studio 1810c audio interface on Linux. It speaks the
@@ -17,17 +18,80 @@
       four input pairs, output rails and a master column, with the current clock
       and sample-rate status shown at all times.
     </p>
+    <p>
+      Level meters are computed from the PipeWire or PulseAudio stream, because the
+      interface's firmware does not report levels over USB — a limitation that is
+      documented rather than hidden.
+    </p>
+    <p>
+      The routing matrix, faders, switches and clock status are hardware verified.
+      No kernel patches and no firmware writes: the interface keeps working as an
+      ordinary ALSA device the whole time.
+    </p>
   </description>
+
+  <!-- Search terms for GNOME Software and KDE Discover: the strings people
+       actually type when their interface's controls are missing on Linux. -->
+  <keywords>
+    <keyword>mixer</keyword>
+    <keyword>audio interface</keyword>
+    <keyword>routing</keyword>
+    <keyword>routing matrix</keyword>
+    <keyword>faders</keyword>
+    <keyword>PreSonus</keyword>
+    <keyword>Fender</keyword>
+    <keyword>Studio 1810c</keyword>
+    <keyword>Universal Control</keyword>
+    <keyword>ALSA</keyword>
+    <keyword>PipeWire</keyword>
+    <keyword>JACK</keyword>
+    <keyword>DAW</keyword>
+    <keyword>recording</keyword>
+    <keyword>home studio</keyword>
+  </keywords>
+
   <launchable type="desktop-id">io.github.uc1810c.Mixer.desktop</launchable>
+
   <provides>
     <modalias>usb:v194Fp010Cd*</modalias>
     <modalias>usb:v194Fp0107d*</modalias>
     <modalias>usb:v194Fp010Dd*</modalias>
   </provides>
+
   <categories>
     <category>AudioVideo</category>
     <category>Audio</category>
+    <category>Mixer</category>
   </categories>
-  <url type="homepage">https://github.com/uc1810c/studio-1810c</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The mixer window with routing matrix, output faders and live meters</caption>
+      <image type="source">https://raw.githubusercontent.com/xenprotocol/studio-1810c/main/docs/meters.png</image>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="1.1.2" date="2026-11-27">
+      <description>
+        <p>Reset routing from the window, and a quiet launch on Wayland and X11.</p>
+      </description>
+    </release>
+    <release version="1.1.0" date="2026-11-27">
+      <description>
+        <p>Live level meters computed from the audio stream.</p>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-11-27"/>
+  </releases>
+
+  <developer id="io.github.xenprotocol">
+    <name>Thomas Hendriksen</name>
+  </developer>
+
+  <url type="homepage">https://github.com/xenprotocol/studio-1810c</url>
+  <url type="bugtracker">https://github.com/xenprotocol/studio-1810c/issues</url>
+  <url type="vcs-browser">https://github.com/xenprotocol/studio-1810c</url>
+
   <content_rating type="oars-1.1"/>
 </component>

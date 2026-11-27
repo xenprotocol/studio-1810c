@@ -246,6 +246,30 @@ ghidra_scripts/     Ghidra scripts that dumped the protocol out of the mach-o bi
 ./uc1810c.py verify                           # write/read round-trip on real hardware
 ```
 
+## If you searched for this
+
+You probably arrived from one of these. They all lead here:
+
+- **"PreSonus Studio 1810c Linux driver"** — there is no vendor driver, and none is
+  needed for audio: the interface is class-compliant and `snd-usb-audio` already
+  streams it. What was missing is everything *not* audio — the mixer.
+- **"Universal Control Linux alternative"**, "Universal Control for Ubuntu" — this
+  is that replacement: routing matrix, output faders, front-panel switches, clock.
+- **"Studio 1810c mixer not detected on Linux"**, "alsamixer only shows five
+  controls for my 1810c" — correct, and expected: ALSA exposes five switches and
+  nothing else. The matrix lives behind a vendor USB interface.
+- **"Studio 1810c routing matrix Linux"**, "how do I change the 1810c outputs on
+  Linux", "1810c main output vs line outputs Linux"
+- **"PreSonus 1810c Ubuntu 24.04"**, "1810c Fedora", "1810c Arch", "1810c
+  PipeWire", "1810c JACK", "1810c Ardour / Reaper / Bitwig on Linux"
+- **"Fender Studio 1810c Linux support"** — Fender bought PreSonus; the device is
+  the same one, with the same USB identity.
+
+**Is this my interface?** The Studio 1810c enumerates as `194f:010c`. If `lsusb`
+shows that, this is for your hardware. The Studio 1824 and 1824c (`194f:0107`,
+`194f:010d`) have a different matrix size and are refused by name — nothing is
+written to them.
+
 ## Credit
 
 The `0xA0`/`0xA1`/`0xA2` half of this protocol was reverse engineered by **Nick
