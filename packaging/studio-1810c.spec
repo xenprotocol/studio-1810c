@@ -91,6 +91,12 @@ command -v udevadm >/dev/null && udevadm control --reload-rules || :
 %{_prefix}/lib/udev/rules.d/99-presonus-1810c.rules
 
 %changelog
+* Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.1.2-1
+- "Reset routing" button in the mixer header: restores the default wiring
+  without a terminal, and mirrors the result into the window
+- Launch is quiet again: Gdk is pinned to 3.0 and the deprecated
+  Gdk.Screen.get_primary_monitor call is replaced with Gdk.Display
+
 * Fri Nov 27 2026 Studio 1810c for Linux <studio-1810c@users.noreply.github.com> - 1.1.1-1
 - Window fits small screens; strips scale down and names no longer truncate
 - Meters re-read channel counts when the stream restarts (ALTSET change)
