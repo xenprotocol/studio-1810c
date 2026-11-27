@@ -1,0 +1,7 @@
+# Kernel reference sources and vendored libraries are not this project's code;
+# keep them out of GitHub's language statistics.
+kernel/* linguist-vendored
+vendor/* linguist-vendored
+
+*.png binary
+*.svg text
