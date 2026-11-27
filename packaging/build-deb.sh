@@ -4,7 +4,7 @@ set -euo pipefail
 
 umask 022                     # lintian-clean directory modes regardless of the caller's umask
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${VERSION:-1.1.1}"
+VERSION="${VERSION:-1.1.2}"
 ARCH="$(dpkg --print-architecture)"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT

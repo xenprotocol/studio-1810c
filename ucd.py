@@ -129,6 +129,31 @@ class Surface:
             raise RuntimeError(self.error)
         return self.dev
 
+    def reset_routing(self):
+        """Restore the kernel's direct routing, and mirror it in the window.
+
+        The device holds the truth, but a window still showing the old matrix
+        would be lying about what the interface is doing.
+        """
+        dev = self.require()
+        with self.lock:
+            dev.reset_routing()
+            for pair in range(len(PAIR_NAMES)):
+                self.state["outputs"][str(pair)] = {"db": 0.0, "mute": False}
+            for ch in range(36):
+                for pair in range(len(PAIR_NAMES)):
+                    self.state["strips"]["%d:%d" % (pair, ch)] = {
+                        "level_db": -96.0, "pan": 0.0, "mute": True}
+            # direct wiring: DAW 1-8 feed the four pairs, DAW 1/2 -> Main etc.
+            for pair in range(4):
+                for side in (0, 1):
+                    ch = 18 + 2 * pair + side
+                    self.state["strips"]["%d:%d" % (pair, ch)] = {
+                        "level_db": 0.0, "pan": 0.0, "mute": False}
+            self.state["applied_at"] = time.strftime("%H:%M:%S")
+            self.save()
+        return self.state["applied_at"]
+
     def apply_all(self):
         """Push the whole session to the device."""
         dev = self.require()
@@ -342,6 +367,9 @@ class Handler(BaseHTTPRequestHandler):
             if url.path == "/api/switch":
                 SURFACE.write_switch(body["name"], bool(body["value"]))
                 return self._send(200, {"ok": True})
+            if url.path == "/api/reset-routing":
+                applied = SURFACE.reset_routing()
+                return self._send(200, {"ok": True, "applied_at": applied})
             if url.path == "/api/apply":
                 SURFACE.apply_all()
                 return self._send(200, {"ok": True, "applied_at": SURFACE.state["applied_at"]})

@@ -2,7 +2,7 @@
 %global appdir %{_prefix}/lib/studio-1810c
 
 Name:           studio-1810c
-Version:        1.1.1
+Version:        1.1.2
 Release:        1%{?dist}
 Summary:        Mixer and routing control for the PreSonus / Fender Studio 1810c
 License:        MIT

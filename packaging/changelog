@@ -1,3 +1,13 @@
+studio-1810c (1.1.2) unstable; urgency=medium
+
+  * "Reset routing" in the mixer header: restores the default wiring (matrix
+    cleared, DAW 1-8 to the four pairs at 0 dB) without a terminal. Until now a
+    musician who wrecked their routing needed the command line.
+  * The window mirrors what the reset wrote, so it cannot show a matrix the
+    interface is not running.
+
+ -- Studio 1810c for Linux <studio-1810c@users.noreply.github.com>  Fri, 27 Nov 2026 16:55:00 +0100
+
 studio-1810c (1.1.1) unstable; urgency=medium
 
   * The window fits the screen it opens on (1024x680 minimum): 1400x880 on a

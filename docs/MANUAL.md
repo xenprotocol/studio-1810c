@@ -153,6 +153,11 @@ The scale runs from −60 dB to +6 dB, green up to about −12 dB, amber near 0,
 at the top. The bars peak-hold for a fifth of a second and fall back at
 14 dB/s, so a transient stays visible long enough to read.
 
+If the routing ends up somewhere you did not intend, **Reset routing** in the
+mixer header puts it back to the default wiring: every matrix cell muted, then
+DAW 1/2 to Main, 3/4 to Line 1/2, 5/6 to Line 3/4 and 7/8 to S/PDIF at 0 dB. It
+asks first, writes immediately, and updates the window to match.
+
 Two honest limits:
 
 - they need **PipeWire** (or PulseAudio) — if neither is running, the bars are

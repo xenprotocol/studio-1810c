@@ -1,6 +1,6 @@
 # Maintainer: Studio 1810c for Linux <studio-1810c@users.noreply.github.com>
 pkgname=studio-1810c
-pkgver=1.1.0
+pkgver=1.1.1
 pkgrel=1
 pkgdesc="Mixer and routing control for the PreSonus / Fender Studio 1810c audio interface"
 arch=('any')
@@ -10,7 +10,7 @@ depends=('python' 'python-gobject' 'gtk3' 'webkit2gtk-4.1' 'libusb')
 makedepends=('librsvg')
 optdepends=('alsa-utils: sample-rate readout and uc1810c.py doctor')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/xenprotocol/studio-1810c/archive/v$pkgver.tar.gz")
-sha256sums=('89e680ca6ad2ae2a5888015c577294bdf04763ccbbc42b702c2b436fbb547a63')
+sha256sums=('d14725ce84c7a8adc28a1d85552f792a987849ce93f5ef62990cd4712c4be03f')
 
 package() {
   local appdir="$pkgdir/usr/lib/studio-1810c"

@@ -642,6 +642,31 @@ async function boot() {
     }
   });
 
+  $("#reset-routing").addEventListener("click", async () => {
+    const ok = window.confirm(
+      "Reset the routing to the default wiring?\n\n" +
+      "All matrix cells are muted, then DAW 1/2 goes to Main, 3/4 to Line 1/2, " +
+      "5/6 to Line 3/4 and 7/8 to S/PDIF, at 0 dB.\n\n" +
+      "Your saved values in this window are replaced. This writes to the device now.");
+    if (!ok) return;
+    const btn = $("#reset-routing");
+    btn.disabled = true;
+    btn.textContent = "Resetting…";
+    try {
+      const res = await api("/api/reset-routing", {});
+      $("written").textContent = "last write " + res.applied_at;
+      notice(null);
+      applyInfo(await api("/api/info"));
+      renderStrips();
+      renderOutputs();
+    } catch (err) {
+      notice("Reset failed: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Reset routing";
+    }
+  });
+
   $("#clear-pair").addEventListener("click", () => {
     for (const input of state.info.inputs) {
       const s = stripFor(input.ch);

@@ -23,6 +23,9 @@ sys.path.insert(0, os.path.join(HERE, "vendor"))
 import gi
 
 gi.require_version("Gtk", "3.0")
+# Gdk must be pinned too: without this, resolving "Gdk" picks 4.0 and the import
+# below dies with "Gdk version 3.0, but 4.0 is already loaded".
+gi.require_version("Gdk", "3.0")
 try:                                   # Ubuntu 22.04+, Debian 12+
     gi.require_version("WebKit2", "4.1")
 except ValueError:                     # Ubuntu 20.04, older 22.04 installs
@@ -33,7 +36,7 @@ except ValueError:                     # Ubuntu 20.04, older 22.04 installs
             "This app needs WebKitGTK. Install it with:\n"
             "    sudo apt install gir1.2-webkit2-4.1\n"
             "or, on older releases, gir1.2-webkit2-4.0")
-from gi.repository import Gtk, GLib, WebKit2  # noqa: E402
+from gi.repository import Gdk, Gtk, GLib, WebKit2  # noqa: E402
 
 APP_ID = "io.github.uc1810c.Mixer"
 APP_NAME = "Studio 1810c"
@@ -65,12 +68,12 @@ class Window(Gtk.ApplicationWindow):
         # size, but a musician's laptop is often 1366x768 and a window taller
         # than the screen hides the master faders.
         width, height = 1400, 880
-        # Gtk.Widget.get_screen() rather than importing Gdk: a bare
-        # "from gi.repository import Gdk" loads Gdk 4.0 alongside Gtk 3.0 and
-        # the import dies with "Gdk version 3.0, but 4.0 is already loaded".
+        # Gdk.Display rather than the deprecated Gdk.Screen API.
         try:
-            screen = self.get_screen()
-            monitor = screen.get_primary_monitor() or screen.get_monitor(0)
+            display = Gdk.Display.get_default()
+            monitor = display.get_primary_monitor() if display else None
+            if monitor is None and display is not None:
+                monitor = display.get_monitor(0)
             area = monitor.get_workarea()
             width = min(width, max(1024, area.width - 40))
             height = min(height, max(680, area.height - 60))

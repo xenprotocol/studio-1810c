@@ -48,10 +48,10 @@ mixer matrix, exactly as the kernel already does at probe time.
 
 ### Ubuntu, Debian, Linux Mint (the normal way)
 
-Download `studio-1810c_1.1.1_amd64.deb` from [Releases](../../releases), then:
+Download `studio-1810c_1.1.2_amd64.deb` from [Releases](../../releases), then:
 
 ```bash
-sudo apt install ./studio-1810c_1.1.1_amd64.deb
+sudo apt install ./studio-1810c_1.1.2_amd64.deb
 ```
 
 or double-click the file and let your software installer handle it. `apt` pulls
