@@ -1,0 +1,38 @@
+.TH STUDIO-1810C 1 "November 2026" "studio-1810c 1.0.0" "User Commands"
+.SH NAME
+studio-1810c \- mixer and routing control for the PreSonus / Fender Studio 1810c
+.SH SYNOPSIS
+.B studio-1810c
+.SH DESCRIPTION
+Opens a mixer window for the Studio 1810c audio interface. The window drives the
+vendor USB protocol directly, so it can change the 18x10 routing matrix, the
+output faders and the front-panel switches while the kernel driver keeps
+streaming audio. Nothing needs to be unbound and playback keeps running.
+.PP
+The interface is opened through libusb. A udev rule installed with this package
+grants members of the
+.B plugdev
+group and the logged-in desktop user access to it; if the rule is missing the
+application offers to install it after an administrator prompt.
+.PP
+State is saved to
+.I ~/.config/studio-1810c/state.json
+and pushed to the device on demand. The matrix cannot be read back, so the
+window marks a restored session as not pushed until you apply it.
+.SH ENVIRONMENT
+.TP
+.B UC_APP_GEOM
+Debugging aid: "X,Y,W,H" positions and pins the window so a screenshot can be
+cropped deterministically. Not needed in normal use.
+.SH FILES
+.TP
+.I /usr/lib/studio-1810c/
+Application payload.
+.TP
+.I /usr/lib/udev/rules.d/99-presonus-1810c.rules
+Device permission rule.
+.SH SEE ALSO
+.BR amixer (1),
+.BR aplay (1)
+.SH AUTHOR
+Studio 1810c for Linux contributors.

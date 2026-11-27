@@ -1,0 +1,66 @@
+# Maintainer: Studio 1810c for Linux <studio-1810c@users.noreply.github.com>
+pkgname=studio-1810c
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Mixer and routing control for the PreSonus / Fender Studio 1810c audio interface"
+arch=('any')
+url="https://github.com/xenprotocol/studio-1810c"
+license=('MIT')
+depends=('python' 'python-gobject' 'gtk3' 'webkit2gtk-4.1' 'libusb')
+optdepends=('alsa-utils: sample-rate readout and uc1810c.py doctor')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/xenprotocol/studio-1810c/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')   # replace with the real sum before publishing
+
+package() {
+  local appdir="$pkgdir/usr/lib/studio-1810c"
+
+  install -d "$appdir/ui" "$appdir/vendor" \
+            "$pkgdir/usr/bin" \
+            "$pkgdir/usr/share/applications" \
+            "$pkgdir/usr/share/metainfo" \
+            "$pkgdir/usr/share/man/man1" \
+            "$pkgdir/usr/share/doc/studio-1810c" \
+            "$pkgdir/usr/lib/udev/rules.d" \
+            "$pkgdir/usr/share/icons/hicolor/scalable/apps"
+
+  install -m644 "$srcdir/$pkgname-$pkgver/"{ucapp.py,ucd.py,uc1810c.py} "$appdir/"
+  cp -r "$srcdir/$pkgname-$pkgver/ui/." "$appdir/ui/"
+  cp -r "$srcdir/$pkgname-$pkgver/vendor/." "$appdir/vendor/"
+  find "$appdir" -name __pycache__ -type d -prune -exec rm -rf {} +
+
+  install -m755 "$srcdir/$pkgname-$pkgver/packaging/studio-1810c" "$pkgdir/usr/bin/studio-1810c"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/io.github.uc1810c.Mixer.desktop" \
+    "$pkgdir/usr/share/applications/"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/io.github.uc1810c.Mixer.metainfo.xml" \
+    "$pkgdir/usr/share/metainfo/"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/studio-1810c.svg" \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/studio-1810c.1" \
+    "$pkgdir/usr/share/man/man1/"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/copyright" \
+    "$pkgdir/usr/share/doc/studio-1810c/"
+  install -m644 "$srcdir/$pkgname-$pkgver/packaging/changelog" \
+    "$pkgdir/usr/share/doc/studio-1810c/"
+  install -m644 "$srcdir/$pkgname-$pkgver/99-presonus-1810c.rules" \
+    "$pkgdir/usr/lib/udev/rules.d/"
+
+  for size in 48 64 128 256; do
+    install -d "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps"
+    rsvg-convert -w "$size" -h "$size" \
+      "$srcdir/$pkgname-$pkgver/packaging/studio-1810c.svg" \
+      -o "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps/studio-1810c.png"
+  done
+}
+
+post_install() {
+  udevadm control --reload-rules || true
+  udevadm trigger --action=add --subsystem-match=usb || true
+  update-desktop-database -q /usr/share/applications 2>/dev/null || true
+  gtk-update-icon-cache -q -t /usr/share/icons/hicolor 2>/dev/null || true
+}
+
+post_upgrade() { post_install; }
+
+post_remove() {
+  udevadm control --reload-rules || true
+}

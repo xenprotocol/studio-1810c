@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio 1810c - control surface</title>
+<link rel="stylesheet" href="/ui/app.css">
+</head>
+<body>
+<a class="skip" href="#mixer">Skip to mixer</a>
+
+<header class="bar">
+  <div class="brand">
+    <span class="brand__mark">1810c</span>
+    <span class="brand__sub">control surface</span>
+  </div>
+
+  <div class="status" id="status">
+    <span class="chip chip--wait" id="chip-link" role="status">connecting</span>
+    <span class="chip" id="chip-rate">rate unknown</span>
+    <span class="chip" id="chip-clock">clock unknown</span>
+  </div>
+
+  <div class="actions">
+    <span class="written" id="written">nothing written yet</span>
+    <select id="presets" class="select" aria-label="Saved presets">
+      <option value="">presets</option>
+    </select>
+    <button class="btn" id="preset-save" type="button">Save preset</button>
+    <button class="btn btn--primary" id="apply" type="button">Push session</button>
+    <button class="btn btn--icon" id="theme" type="button" aria-label="Switch theme">◐</button>
+  </div>
+</header>
+
+<div class="notice" id="notice" hidden>
+  <span id="notice-text"></span>
+  <button class="btn btn--small" id="notice-retry" type="button">Retry</button>
+</div>
+
+<main class="shell">
+  <!-- outputs -->
+  <nav class="rail" aria-label="Output pairs">
+    <p class="label">Outputs</p>
+    <div id="pairs"></div>
+    <p class="hint">
+      Each pair is an independent mix. A channel strip feeds only the pair
+      selected here.
+    </p>
+  </nav>
+
+  <!-- mixer -->
+  <section class="mixer" id="mixer" aria-label="Mixer">
+    <div class="mixer__head">
+      <div>
+        <h1 class="mixer__title" id="mix-title">Main</h1>
+        <p class="mixer__sub" id="mix-sub">18 inputs into Main</p>
+      </div>
+      <div class="mixer__tools">
+        <button class="btn btn--small" id="clear-pair" type="button">Mute all inputs</button>
+      </div>
+    </div>
+
+    <div class="groups" id="groups"></div>
+  </section>
+
+  <!-- master -->
+  <aside class="master" aria-label="Master and global">
+    <p class="label">Master</p>
+    <div class="outfaders" id="outfaders"></div>
+
+    <p class="label label--gap">Global</p>
+    <div class="switches" id="switches"></div>
+
+    <p class="label label--gap">Device telemetry</p>
+    <p class="hint" id="telemetry-hint">
+      Eight values read from the state packet. Not yet identified - shown raw.
+    </p>
+    <div class="telemetry" id="telemetry"></div>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>Protocol reversed from Universal Control 5.1.1 - vendor control transfers, write-only matrix.</span>
+  <span id="foot-device"></span>
+</footer>
+
+<script src="/ui/app.js"></script>
+</body>
+</html>

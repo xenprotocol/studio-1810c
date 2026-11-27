@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.uc1810c.Mixer</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Studio 1810c</name>
+  <summary>Mixer and routing control for the PreSonus / Fender Studio 1810c</summary>
+  <description>
+    <p>
+      A desktop mixer for the Studio 1810c audio interface on Linux. It speaks the
+      vendor USB protocol to control the 18x10 routing matrix and the output faders
+      that ALSA does not expose, plus the front-panel switches, while the kernel
+      driver keeps streaming audio.
+    </p>
+    <p>
+      The window follows the layout of Universal Control on macOS and Windows:
+      four input pairs, output rails and a master column, with the current clock
+      and sample-rate status shown at all times.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.uc1810c.Mixer.desktop</launchable>
+  <provides>
+    <modalias>usb:v194Fp010Cd*</modalias>
+    <modalias>usb:v194Fp0107d*</modalias>
+    <modalias>usb:v194Fp010Dd*</modalias>
+  </provides>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+  </categories>
+  <url type="homepage">https://github.com/uc1810c/studio-1810c</url>
+  <content_rating type="oars-1.1"/>
+</component>

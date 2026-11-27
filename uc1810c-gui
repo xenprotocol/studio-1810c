@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Start the 1810c control daemon if it is not already running, then open the UI.
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PORT="${UC1810C_PORT:-8777}"
+URL="http://127.0.0.1:${PORT}/"
+
+if ! curl -sf "${URL}api/info" >/dev/null 2>&1; then
+  cd "$DIR"
+  if [ ! -x .venv/bin/python ]; then
+    python3 -m venv .venv
+    ./.venv/bin/pip -q install pyusb
+  fi
+  ./.venv/bin/python ucd.py --port "$PORT" --no-browser >"${TMPDIR:-/tmp}/ucd.log" 2>&1 &
+  for _ in $(seq 1 80); do
+    if curl -sf "${URL}api/info" >/dev/null 2>&1; then break; fi
+    sleep 0.1
+  done
+fi
+
+if ! curl -sf "${URL}api/info" >/dev/null 2>&1; then
+  echo "daemon did not start - see ${TMPDIR:-/tmp}/ucd.log" >&2
+  exit 1
+fi
+
+echo "$URL"
+if command -v xdg-open >/dev/null 2>&1; then
+  xdg-open "$URL" >/dev/null 2>&1 || true
+fi

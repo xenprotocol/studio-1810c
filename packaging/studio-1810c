@@ -1,0 +1,3 @@
+#!/bin/sh
+# Launcher installed by the studio-1810c package.
+exec /usr/bin/python3 /usr/lib/studio-1810c/ucapp.py "$@"

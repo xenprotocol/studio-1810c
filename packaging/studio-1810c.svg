@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="chassis" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#232a34"/>
+      <stop offset="1" stop-color="#12171d"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="44" fill="url(#chassis)" stroke="#39424e" stroke-width="4"/>
+  <!-- three fader slots -->
+  <rect x="62"  y="52" width="10" height="152" rx="5" fill="#0b0e12"/>
+  <rect x="123" y="52" width="10" height="152" rx="5" fill="#0b0e12"/>
+  <rect x="184" y="52" width="10" height="152" rx="5" fill="#0b0e12"/>
+  <!-- unity ticks -->
+  <rect x="52" y="80" width="30" height="2" fill="#4a5563"/>
+  <rect x="113" y="80" width="30" height="2" fill="#4a5563"/>
+  <rect x="174" y="80" width="30" height="2" fill="#4a5563"/>
+  <!-- thumbs -->
+  <rect x="50"  y="150" width="34" height="16" rx="4" fill="#e8a33d" stroke="#0b0e12" stroke-width="2"/>
+  <rect x="111" y="96"  width="34" height="16" rx="4" fill="#e8efF6" stroke="#0b0e12" stroke-width="2"/>
+  <rect x="172" y="126" width="34" height="16" rx="4" fill="#e8a33d" stroke="#0b0e12" stroke-width="2"/>
+</svg>

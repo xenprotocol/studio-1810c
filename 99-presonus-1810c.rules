@@ -1,0 +1,8 @@
+# PreSonus / Fender Studio 1810c - allow the desktop user to send vendor
+# control transfers (EP0 only; the kernel keeps the streaming interfaces).
+# Two grants on purpose: uaccess (logind ACL) and plugdev (works when the ACL
+# is not applied because the rule landed after the device enumerated).
+SUBSYSTEM=="usb", ATTR{idVendor}=="194f", ATTR{idProduct}=="010c", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+# Siblings in the same family, harmless to include:
+SUBSYSTEM=="usb", ATTR{idVendor}=="194f", ATTR{idProduct}=="0107", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="194f", ATTR{idProduct}=="010d", MODE="0660", GROUP="plugdev", TAG+="uaccess"

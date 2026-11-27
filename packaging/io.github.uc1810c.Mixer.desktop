@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Studio 1810c
+GenericName=Audio interface mixer
+Comment=Control the PreSonus / Fender Studio 1810c mixer
+Exec=studio-1810c
+Icon=studio-1810c
+Terminal=false
+Categories=AudioVideo;Audio;Mixer;
+Keywords=mixer;audio;presonus;fender;1810c;interface;
+StartupNotify=true
+StartupWMClass=ucapp.py

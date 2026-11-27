@@ -1,0 +1,31 @@
+# Reverse-engineering workspace: extracted vendor binaries and Ghidra output.
+# These are NOT redistributed - extract them from your own Universal Control
+# installer if you want to reproduce the analysis.
+dmg/
+pkg/
+payload/
+trees/
+thin/
+dump/
+ghidra_proj/
+live/
+*.dmg
+*.pkg
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Build output
+dist/
+rpmbuild/
+*.deb
+*.rpm
+*.pkg.tar.zst
+
+# Scratch
+*.log
+
+# Local dev harnesses
+.dev/
