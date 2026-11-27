@@ -127,6 +127,11 @@ fields 48..57  constant 0
 fields 58..62  switch states, verified live (see below)
 ```
 
+Polling rate matters: at 20 Hz the device stops answering `0xA1` after a few
+seconds and the read fails with EPIPE (`Pipe error`) while audio is streaming;
+2 Hz runs for minutes without a stall. Keep background polling at or below
+about 4 Hz.
+
 Switch fields were verified in both directions: writing `0xA0` selector 0 /
 ctl 3 (A/B) and ctl 0 (line) with this tool changes fields 62 and 59, and the
 kernel's own ALSA controls - which read those same fields - follow immediately.
@@ -203,6 +208,29 @@ behind the audio-mode switch (`0x42`), or they need the interface claimed via
 usbfs (which on Linux means detaching `snd-usb-audio`). Since the matrix and all
 switches already work over `0xA0`, this is not on the critical path - it only
 costs the ability to read the matrix back.
+
+## 6c. Metering - negative result
+
+No request shape found so far returns levels. Everything tried, so nobody has to
+repeat it:
+
+| theory | test | outcome |
+|---|---|---|
+| meter data arrives on an interrupt endpoint | USB descriptor walk | interface 5 has **no endpoints**; the only interrupt IN is EP `0x83` on interface 0, 6 bytes, `bInterval` 8 - the UAC2 audio-control status pipe |
+| fields 4..11 are output meters | -20 dBFS / 1 kHz tone to the S/PDIF output, sampled before/during/after | no change beyond the fields' own drift (deltas smaller than the silence swing) |
+| fields 4..11 are input meters | 60 s capture with a mic tapped on input 1, then a gain sweep, correlated against per-channel RMS | flat: 4-6 dB drift, no spikes, gain sweep moved nothing |
+| levels come from the DSP parameter channel | `0xC1` 0x00/0x01 and `0xD1`/`0xD2` across recipients (device, interface) and wIndex 0-5 | EPIPE on every combination |
+| the driver supplies meters | strings in `com.fender.tusbaudiodriver.dext` | only `AudioVolumeLevelControl` / `AudioLineLevelControl`; no metering code |
+
+The meter parameter names in `dspusbdevice.dylib` (`input1LevelMeter`,
+`input1ReductionMeter`, `input3LeftLevelMeter`, `output1LevelMeter`,
+`metercurve`) belong to the DSP-parameter model used by models that implement
+that interface; on this device the interface is absent.
+
+Note on the field scale: fields 4..11 are always multiples of `0x100`, i.e.
+24-bit quantities on the same scale as matrix levels (`0x1000000` = 0 dB), which
+put them between about -58 dB and -38 dB. That resemblance to levels is what made
+them look like meters; the tests above show they are not driven by audio.
 
 ## 7. Physical interface map (live, `lsusb -v`)
 

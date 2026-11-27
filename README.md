@@ -155,11 +155,20 @@ when a client opens the device. The kernel's `s1810c_skip_setting_quirk`
 
 Being straight about this, because you will notice:
 
-- **Meters are not decoded.** The state packet carries eight values that change
-  continuously (fields 4–11). They do not follow a routed tone and do not drop on
-  mute, so they are not output meters; they are shown raw in the telemetry panel,
-  labelled as unidentified. Real metering most likely lives on an interrupt
-  endpoint that has not been reverse-engineered yet.
+- **Meters are not available from this firmware** — not "not decoded yet",
+  tested. In order: interface 5 (the vendor interface) has **zero endpoints** and
+  the only interrupt IN on the device is `0x83`, the 6-byte UAC2 status pipe on
+  interface 0, so there is no meter stream to read; the eight raw values in the
+  state packet follow neither playback (a −20 dBFS tone to S/PDIF moves them by
+  less than their own drift) nor a mic on input 1 (tapping and sweeping its gain
+  left them flat); and the DSP parameter channel that carries Universal Control's
+  own meter parameter names (`input1LevelMeter`, `input1ReductionMeter`, …)
+  answers on no recipient or interface index. The macOS driver contains no
+  metering code either — only volume and line-level controls. The conclusion is
+  that the 1810c does not report levels to the host. Honest metering on Linux has
+  to be computed from the audio stream (PipeWire peak monitoring), which is the
+  planned approach; the eight unknown values are shown raw and labelled as such
+  until they are identified.
 - **Clock status semantics are unresolved.** `0xA4` answers, but returns an
   all-zero status word for internal, S/PDIF and ADAT alike — the encoding is
   unknown, so the UI reports only what it can prove.
