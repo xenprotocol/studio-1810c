@@ -234,4 +234,5 @@ this is community software, provided as is.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). The vendored `pyusb` is BSD-3-Clause.
+MIT — see [LICENSE](LICENSE). The vendored `pyusb` is BSD-3-Clause and the
+kernel reference copies are GPL-2.0-only; both are spelled out in [NOTICE](NOTICE).

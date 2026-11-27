@@ -1,0 +1,43 @@
+Third-party material in this repository
+=======================================
+
+The MIT licence in LICENSE covers the code written for this project:
+uc1810c.py, ucd.py, ucapp.py, the files in ui/, the packaging scripts, the
+tests and the documentation.
+
+Two directories contain material under other licences.
+
+
+vendor/ - PyUSB
+---------------
+
+PyUSB is Copyright (c) 2010-2024 Wander Lairson Costa and contributors, and is
+distributed under the BSD 3-Clause licence. It is vendored unchanged (minus
+byte-code caches) so the application needs no pip install at runtime and is not
+affected by PEP 668. See vendor/LICENSE for the full text.
+
+
+kernel/ - Linux kernel sources
+------------------------------
+
+The files in kernel/ are snapshots of Linux kernel sources and remain
+GPL-2.0-only:
+
+  mixer_s1810c.c    sound/usb/mixer_s1810c.c    (Nick Kossifidis)
+  mixer.c           sound/usb/mixer.c
+  quirks.c          sound/usb/quirks.c
+  quirks-table.h    sound/usb/quirks-table.h
+
+They are included as reference material for people extending this project or
+porting it to another model. Nothing in this repository compiles, links or
+imports them: studio-1810c is a userspace program that reaches the interface
+through libusb. Each file's own copyright header is authoritative.
+
+
+Vendor software is not redistributed
+------------------------------------
+
+No PreSonus or Fender binary, installer, driver or firmware appears in this
+repository. The protocol documented in PROTOCOL.md was recovered from a copy of
+Universal Control that the author is licensed to run, and from USB traffic
+observed on hardware the author owns.

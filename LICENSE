@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-The vendored copies of pyusb in vendor/ are distributed under the BSD 3-Clause
-licence; see vendor/LICENSE.
-
-The files in kernel/ are snapshots of Linux kernel sources and remain GPL-2.0.
-They are reference material only and are not linked into this program.
